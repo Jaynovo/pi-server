@@ -10,3 +10,17 @@ services:
       POSTGRES_DB: mydb
     ports:
       - "5432:5432"
+  webapp:
+    build: ./webapp
+    container_name: pi_webapp
+    restart: always
+    environment:
+      DB_HOST: mydb
+      DB_PORT: 5432
+      DB_NAME: mydb
+      DB_USER: piuser
+      DB_PASSWORD: secret
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db

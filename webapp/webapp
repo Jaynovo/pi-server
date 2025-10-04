@@ -1,0 +1,59 @@
+from flask import Flask, jsonify, render_template_string
+import psycopg2
+
+app = Flask(__name__)
+
+def get_db_connection():
+    return psycopg2.connect(
+        dbname="mydb",
+        user="piuser",
+        password="secret",
+        host="192.168.0.183",
+        port="5432"
+    )
+@app.route('/')
+def index():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT station_id, timestamp, temperature FROM weather_data ORDER BY timestamp DESC LIMIT 100')
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    html = '''
+    <html>
+        <head><title>Weather Data</title></head>
+        <body>
+            <h1>Latest Weather Data</h1>
+            <table border="1">
+                <tr><th>Station ID</th><th>Timestamp</th><th>Temperature (°C)</th></tr>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </body>
+    </html>
+    '''
+    return render_template_string(html, data=data)
+
+@app.route('/api/data')
+def api_data():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT station_id, timestamp, temperature FROM weather_data ORDER BY timestamp DESC LIMIT 100')
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    result = [
+        {"station_id": row[0], "timestamp": row[1].isoformat(), "temperature": row[2]}
+        for row in data
+    ]
+    return jsonify(result)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
