@@ -1,4 +1,4 @@
-DROP TABLE stations IF EXISTS;
+DROP TABLE IF EXISTS stations;
 
 --Table to store weather station information
 --This is what you get from the stations API endpoint
@@ -12,7 +12,7 @@ CREATE TABLE stations (
     active       BOOLEAN
 );
 
-DROP TABLE weather_data IF EXISTS;
+DROP TABLE IF EXISTS weather_data;
 CREATE TABLE weather_data (
     id           SERIAL PRIMARY KEY,
     station_id   VARCHAR(50) REFERENCES stations(station_id),
