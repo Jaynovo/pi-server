@@ -25,10 +25,10 @@ try:
         latitude = station.get("lat")
         longitude = station.get("lon")
         elevation = station.get("altitude")
-        is_active = station.get("is_active")
+        active = station.get("active")
 
         cursor.execute("""
-            INSERT INTO stations (station_id, name, state, latitude, longitude, elevation, is_active)
+            INSERT INTO stations (station_id, name, state, latitude, longitude, elevation, active)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (station_id) DO UPDATE SET
                 name = EXCLUDED.name,
@@ -36,11 +36,12 @@ try:
                 latitude = EXCLUDED.latitude,
                 longitude = EXCLUDED.longitude,
                 elevation = EXCLUDED.elevation,
-                is_active = EXCLUDED.is_active
-        """, (station_id, name, state, latitude, longitude, elevation, is_active))
+                active = EXCLUDED.active
+        """, (station_id, name, state, latitude, longitude, elevation, active))
         connection.commit()
 finally:
     if 'cursor' in locals():
         cursor.close()
-    connection.close() #all inserts for better performance
     connection.commit()
+    connection.close() #all inserts for better performance
+    
